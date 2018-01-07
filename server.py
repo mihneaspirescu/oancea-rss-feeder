@@ -1,79 +1,90 @@
-from lxml import etree
-from lxml import html
-import feedgenerator
-import requests
-import os
 from flask import Flask
-
+from flask import jsonify
 from flask import request
-from urlparse import urljoin
+
+try:
+    from urllib.parse import urlparse
+    from urllib.parse import urljoin
+except ImportError:
+    from urlparse import urlparse
 from werkzeug.contrib.atom import AtomFeed
 import datetime
+
 from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
-def make_external(url):
+# all news DB
+allnews = []
 
-    # if "#aTodosTitulos" == url:
+
+def captureContent(tr):
+    h1 = tr.findAll('h1')
+    titles = [' '.join(x.span.get_text().split()) for x in h1]
+
+    content_raw = tr.findAll('p')
+    content = [' '.join(x.span.get_text().split()) for x in content_raw if ' '.join(x.span.get_text().split()) != '']
+
+    link = tr.find('a')
+
+    return titles, content, link
+
+
+def captureText(tables):
+    news11 = []
+    news13 = []
+    trs11 = tables[11].findAll('tr')
+    trs13 = tables[13].findAll('tr')
+
+    for tr in trs13:
+        titles, content, link = captureContent(tr)
+        if len(titles) != 0 and len(content) != 0:
+            news13.append((titles[0], content, link.get('href')))
+
+    for tr in trs11:
+        titles, content, link = captureContent(tr)
+        if len(titles) != 0 and len(content) != 0:
+            news11.append((titles[0], content, link.get('href')))
+
+    if len(news11) != 0:
+        return news11
+    else:
+        return news13
+
+
+def make_external(url):
     return urljoin(request.url_root, "http://google.com")
-    # return urljoin(request.url_root, url)
+
+
 def split_list(alist, wanted_parts=1):
     length = len(alist)
-    return [ alist[i*length // wanted_parts: (i+1)*length // wanted_parts]
-             for i in range(wanted_parts) ]
+    return [alist[i * length // wanted_parts: (i + 1) * length // wanted_parts]
+            for i in range(wanted_parts)]
+
+
+def save_data(content):
+    content = content.decode("utf-8")
+    mystring = content.replace('\n', ' ').replace('\r', '').replace('\t', '')
+    soup = BeautifulSoup(mystring, "lxml")
+
+    tables = soup.find_all('table')
+    news = [(t, '\n'.join(c[:-2]), c[len(c) - 2][8:], l) for t, c, l in captureText(tables)]
+    allnews.extend(news)
+
+
+@app.route('/update', methods=['POST'])
+def update_feed():
+    save_data(request.data)
+    return jsonify({"done": "yes boss"})
+
 
 @app.route('/')
 def recent_feed():
     feed = AtomFeed('Recent Articles',
                     feed_url=request.url, url=request.url_root)
 
-
-
-    with open("email2.htm") as fp:
-        mystring = fp.read().replace('\n', ' ').replace('\r', '').replace('\t', '')
-        soup = BeautifulSoup(mystring, "lxml")
-
-
-    # print(soup)
-    tables = soup.find_all('table')
-    # print(len(tables))
-
-
-
-    news = []
-
-    trs = tables[13].findAll('tr')
-    for tr in trs:
-        h1 = tr.findAll('h1')
-        titles = [' '.join(x.span.get_text().split()) for x in h1]
-
-
-        content_raw = tr.findAll('p')
-        content = [' '.join(x.span.get_text().split()) for x in content_raw if ' '.join(x.span.get_text().split()) != '']
-
-        link = tr.find('a')
-
-
-        if len(titles) != 0 and len(content) != 0:
-            news.append((titles[0], content, link.get('href')))
-
-    news = [(t, '\n'.join(c[:-2]), c[len(c)-2][8:],l) for t, c,l in news]
-
-    # for i, n in enumerate(news):
-    #     print('============= {} ================'.format(i))
-    #     print('title: {}'.format(n[0].encode('utf-8')))
-    #     print('content: {}'.format(n[1].encode('utf-8')))
-    #     print('from: {}'.format(n[2].encode('utf-8')))
-    #     print('link: {}'.format(n[3].encode('utf-8')))
-    #
-    # print('there are {} news'.format(len(news)))
-
-
-    # print(tables[1])
-
     # for each line in the table
-    for i in news:
+    for i in allnews:
         # getting the identifier
 
 
@@ -85,6 +96,3 @@ def recent_feed():
                  )
 
     return feed.get_response()
-
-
-

@@ -40,7 +40,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/Users/mihneaspirescu/Documents/Personal/oancea-rss-reader/venv"
+VIRTUAL_ENV="/Users/mihneaspirescu/Projects/oancea-reader-rss/venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
