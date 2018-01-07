@@ -16,11 +16,21 @@
       <file leaf-file-name="server.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="680">
-              <caret line="131" column="21" lean-forward="false" selection-start-line="131" selection-start-column="21" selection-end-line="131" selection-end-column="21" />
+            <state relative-caret-position="820">
+              <caret line="136" column="36" lean-forward="false" selection-start-line="136" selection-start-column="36" selection-end-line="136" selection-end-column="36" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="rfeed.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/rfeed/rfeed.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="432">
+              <caret line="852" column="100" lean-forward="true" selection-start-line="852" selection-start-column="100" selection-end-line="852" selection-end-column="100" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -40,6 +50,7 @@
       <find>&lt;table</find>
       <find>&lt;body lang=EN-US link=black</find>
       <find>urljoin</find>
+      <find>xml</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -50,6 +61,8 @@
       <list>
         <option value="$PROJECT_DIR$/venv/email2a.html" />
         <option value="$PROJECT_DIR$/email2.htm" />
+        <option value="/usr/local/Cellar/python3/3.6.0/Frameworks/Python.framework/Versions/3.6/lib/python3.6/xml/sax/saxutils.py" />
+        <option value="$PROJECT_DIR$/venv/lib/python3.6/site-packages/rfeed/rfeed.py" />
         <option value="$PROJECT_DIR$/server.py" />
       </list>
     </option>
@@ -460,10 +473,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file:///usr/local/Cellar/python3/3.6.0/Frameworks/Python.framework/Versions/3.6/lib/python3.6/xml/sax/saxutils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="189" column="33" lean-forward="false" selection-start-line="189" selection-start-column="30" selection-end-line="189" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/rfeed/rfeed.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="852" column="100" lean-forward="true" selection-start-line="852" selection-start-column="100" selection-end-line="852" selection-end-column="100" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="680">
-          <caret line="131" column="21" lean-forward="false" selection-start-line="131" selection-start-column="21" selection-end-line="131" selection-end-column="21" />
+        <state relative-caret-position="820">
+          <caret line="136" column="36" lean-forward="false" selection-start-line="136" selection-start-column="36" selection-end-line="136" selection-end-column="36" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>

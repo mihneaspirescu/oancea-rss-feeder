@@ -19,6 +19,7 @@ app = Flask(__name__)
 
 # all news DB
 allnews = {}
+latest_pubdate = "";
 
 
 def merge_two_dicts(x, y):
@@ -89,14 +90,19 @@ def save_data(content):
 
     for id, data in captureText(tables).items():
         if id not in allnews:
+            global latest_pubdate
+            string_date = datetime.datetime.today()
             allnews[id] = (
-            data[0], '\n'.join(data[1][:-2]), data[1][len(data[1]) - 2][8:], data[2], datetime.datetime.today())
+            data[0], '\n'.join(data[1][:-2]), data[1][len(data[1]) - 2][8:], data[2],string_date)
             count_added += 1
+            latest_pubdate = string_date
         else:
             count += 1
 
     return count, count_added
 
+def make_email_addr(name):
+    return "{0}@email.com ({1})".format(name.replace(" ", "").encode('ascii', 'ignore').decode('ascii'), name.encode('ascii', 'ignore').decode('ascii'))
 
 @app.route('/update', methods=['POST'])
 def update_feed():
@@ -104,50 +110,33 @@ def update_feed():
     return jsonify({"success": True, "added": count_added, "duplicates": count})
 
 
-@app.route('/testfeed')
-def test_feed():
-    item1 = Item(
-        title="First article",
-        link="http://www.example.com/articles/1",
-        description="This is the description of the first article",
-        author="Santiago L. Valdarrama",
-        guid=Guid("http://www.example.com/articles/1"),
-        pubDate=datetime.datetime(2014, 12, 29, 10, 00))
 
-    item2 = Item(
-        title="Second article",
-        link="http://www.example.com/articles/2",
-        description="This is the description of the second article",
-        author="Santiago L. Valdarrama",
-        guid=Guid("http://www.example.com/articles/2"),
-        pubDate=datetime.datetime(2014, 12, 30, 14, 15))
+@app.route('/rss.xml')
+def recent_feed():
+    #
+
+    print(allnews.values())
+
+    arr = []
+    # for each line in the table
+    for id,i in allnews.items():
+        # getting the identifier
+        arr.append(Item(
+            title=i[0].encode('ascii', 'ignore').decode('ascii'),
+            link=make_external(i[3]),
+            description=i[1].encode('ascii', 'ignore').decode('ascii'),
+            author=make_email_addr(i[2]),
+            guid=Guid(id, isPermaLink=False),
+            pubDate=i[4]))
 
     feed = Feed(
         title="Sample RSS Feed",
         link="http://www.example.com/rss",
         description="This is an example of how to use rfeed to generate an RSS 2.0 feed",
         language="en-US",
-        lastBuildDate=datetime.datetime.now(),
-        items=[item1, item2])
-    return feed.rss()
+        lastBuildDate=latest_pubdate,
+        items=arr)
+
+    return feed.rss(), 200 ,  {'Content-Type': 'application/rss+xml'}
 
 
-@app.route('/')
-def recent_feed():
-    feed = AtomFeed('Recent Articles',
-                    feed_url=request.url, url=request.url_root)
-
-    print(allnews.values())
-    # for each line in the table
-    for i in allnews.values():
-        # getting the identifier
-
-
-        feed.add(i[0].encode('ascii', 'ignore').decode('ascii'), i[1].encode('ascii', 'ignore').decode('ascii'),
-                 content_type='html',
-                 author=i[2],
-                 url=make_external(i[3]),
-                 updated=i[4]
-                 )
-
-    return feed.get_response()
