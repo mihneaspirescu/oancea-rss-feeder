@@ -1,4 +1,4 @@
-#!/Users/mihneaspirescu/Projects/oancea-reader-rss/venv/bin/python
+#!/Users/mihneaspirescu/Documents/Personal/oancea-rss-reader/venv/bin/python
 
 import sys
 import getopt

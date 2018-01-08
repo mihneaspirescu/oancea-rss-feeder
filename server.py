@@ -19,7 +19,7 @@ app = Flask(__name__)
 
 # all news DB
 allnews = {}
-latest_pubdate = "";
+latest_pubdate = datetime.datetime.today()
 
 
 def merge_two_dicts(x, y):
@@ -61,10 +61,8 @@ def captureText(tables):
             news11[hash_object.hexdigest()] = (titles[0], content, link.get('href'))
 
     if len(news11) != 0:
-        print(news11.items())
         return news11
     else:
-        print(news13.items())
         return news13
 
 
@@ -93,7 +91,7 @@ def save_data(content):
             global latest_pubdate
             string_date = datetime.datetime.today()
             allnews[id] = (
-            data[0], '\n'.join(data[1][:-2]), data[1][len(data[1]) - 2][8:], data[2],string_date)
+                data[0], '\n'.join(data[1][:-2]), data[1][len(data[1]) - 2][8:], data[2], string_date)
             count_added += 1
             latest_pubdate = string_date
         else:
@@ -101,8 +99,11 @@ def save_data(content):
 
     return count, count_added
 
+
 def make_email_addr(name):
-    return "{0}@email.com ({1})".format(name.replace(" ", "").encode('ascii', 'ignore').decode('ascii'), name.encode('ascii', 'ignore').decode('ascii'))
+    return "{0}@email.com ({1})".format(name.replace(" ", "").encode('ascii', 'ignore').decode('ascii'),
+                                        name.encode('ascii', 'ignore').decode('ascii'))
+
 
 @app.route('/update', methods=['POST'])
 def update_feed():
@@ -110,16 +111,23 @@ def update_feed():
     return jsonify({"success": True, "added": count_added, "duplicates": count})
 
 
+def sort_dict(feed):
+    return sorted(feed.items(), key=lambda elem: elem[1][4], reverse=True)
+
+
+@app.route('/reset')
+def reset_db():
+    global allnews
+    allnews = {}
+
+    return jsonify({"success": True, "message": "Emptied the db"})
+
 
 @app.route('/rss.xml')
 def recent_feed():
-    #
-
-    print(allnews.values())
-
     arr = []
     # for each line in the table
-    for id,i in allnews.items():
+    for id, i in sort_dict(allnews):
         # getting the identifier
         arr.append(Item(
             title=i[0].encode('ascii', 'ignore').decode('ascii'),
@@ -130,13 +138,11 @@ def recent_feed():
             pubDate=i[4]))
 
     feed = Feed(
-        title="Sample RSS Feed",
-        link="http://www.example.com/rss",
-        description="This is an example of how to use rfeed to generate an RSS 2.0 feed",
+        title="RSS Feed",
+        link="http://ec2-35-177-192-241.eu-west-2.compute.amazonaws.com/rss.xml",
+        description="Feed for parsing emails...",
         language="en-US",
         lastBuildDate=latest_pubdate,
         items=arr)
 
-    return feed.rss(), 200 ,  {'Content-Type': 'application/rss+xml'}
-
-
+    return feed.rss(), 200, {'Content-Type': 'application/rss+xml'}
