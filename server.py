@@ -1,8 +1,9 @@
+import pickle
 from flask import Flask
 from flask import jsonify
 from flask import request
 import hashlib
-
+import os
 from rfeed import *
 
 try:
@@ -17,9 +18,33 @@ from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
+
 # all news DB
 allnews = {}
 latest_pubdate = datetime.datetime.today()
+
+# save and reload data
+pickle_file = "rssdata.pickle"
+if os.path.exists(pickle_file) is not True:
+    open(pickle_file, 'a').close()
+elif os.path.getsize(pickle_file) != 0:
+    with open(pickle_file, 'rb') as pickle_off:
+        allnews = pickle.load(pickle_off)
+        print("#######################################")
+        print("Preloaded {} posts".format(len(allnews)))
+        print("#######################################")
+
+
+
+def pickle_data(state):
+    print("Saving data...")
+    pickling_on = open(pickle_file, "wb")
+    pickle.dump(state, pickling_on)
+    pickling_on.close()
+    print("Saved!")
+
+
+
 
 
 def merge_two_dicts(x, y):
@@ -97,6 +122,8 @@ def save_data(content):
         else:
             count += 1
 
+    pickle_data(allnews)
+
     return count, count_added
 
 
@@ -119,6 +146,7 @@ def sort_dict(feed):
 def reset_db():
     global allnews
     allnews = {}
+    pickle_data(allnews)
 
     return jsonify({"success": True, "message": "Emptied the db"})
 
