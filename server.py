@@ -5,6 +5,8 @@ from flask import request
 import hashlib
 import os
 from rfeed import *
+import uuid
+
 
 try:
     from urllib.parse import urlparse
@@ -92,7 +94,7 @@ def captureText(tables):
 
 
 def make_external(url):
-    return urljoin(request.url_root, "http://google.com")
+    return urljoin(request.url_root, "http://google.com/{}".format(uuid.uuid4().hex))
 
 
 def split_list(alist, wanted_parts=1):
